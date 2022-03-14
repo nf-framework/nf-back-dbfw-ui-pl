@@ -1,0 +1,18 @@
+[
+    {
+        "caption":  "Пользователи",
+        "path":     "Система",
+        "form":     "admin.users.list",
+        "icon":     "person-group",
+        "guid":     "6a56c7c6-16b1-45d7-bbc2-0afebaf47e69",
+        "order":    10
+    },
+    {
+        "caption":  "Роли",
+        "path":     "Система",
+        "form":     "admin.roles.list",
+        "icon":     "person-group",
+        "guid":     "b6afe25d-a22b-4092-891d-6e3d3a5ca985",
+        "order":    20
+    }
+]
