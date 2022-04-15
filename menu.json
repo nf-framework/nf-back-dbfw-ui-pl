@@ -14,5 +14,13 @@
         "icon":     "person-group",
         "guid":     "b6afe25d-a22b-4092-891d-6e3d3a5ca985",
         "order":    20
+    },
+    {
+        "caption": "Журналирование",
+        "path":    "Система",
+        "form":    "admin.journal.list",
+        "icon":    "database",
+        "guid":    "1272a6db-95e1-4d31-adb7-78aa80532285",
+        "order":    60
     }
 ]
