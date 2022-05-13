@@ -1,7 +1,9 @@
 import path from 'path';
 import { api } from "@nfjs/core";
 import { web } from '@nfjs/back';
-
+import { registerCustomElementsDir } from '@nfjs/front-server';
+import { endpointHandlers } from '@nfjs/front-pl';
+import { endpointAccess } from './lib/endpoint-access.js';
 import { addUser, addUserRole, delUserRole, getPasswordPolicy, delUser } from './lib/users.js';
 import { addRole, delRole, checkRoleDelete, addMenuPerm, delMenuPerm, addUnitPriv, delUnitPriv, addUnitBpPriv, delUnitBpPriv } from './lib/roles.js';
 
@@ -17,6 +19,8 @@ const meta = {
 
 
 async function init() {
+    registerCustomElementsDir('@nfjs/back-dbfw-ui-pl/components');
+    endpointHandlers.access = endpointAccess;
     // users
     web.on('POST', '/@nfjs/back-dbfw-ui-pl/addUser', { middleware: ['session', 'auth', 'json'] }, addUser);
     web.on('POST', '/@nfjs/back-dbfw-ui-pl/getPasswordPolicy', { middleware: ['session', 'auth', 'json'] }, getPasswordPolicy);
