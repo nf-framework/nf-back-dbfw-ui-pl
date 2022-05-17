@@ -1,7 +1,7 @@
 import { html, css } from "polylib";
 import { PlForm } from "@nfjs/front-pl/components/pl-form.js";
 
-export default class UserList extends PlForm {
+export default class RoleList extends PlForm {
     static get properties() {
         return {
             menuList: { value: () => ([]), observer: '_menuListObserver' },
@@ -35,7 +35,7 @@ export default class UserList extends PlForm {
             <pl-flex-layout fit vertical>
                 <pl-flex-layout fit>
                     <pl-flex-layout fit>
-                        <pl-grid data="{{roles}}" selected="{{activeRole}}">
+                        <pl-grid data="{{roles}}" selected="{{activeRole}}" on-row-dblclick="[[onEditRoleClick]]">
                             <pl-flex-layout slot="top-toolbar">
                                 <pl-button variant="primary" label="Добавить" on-click="[[onAddRoleClick]]">
                                     <pl-icon iconset="pl-default" size="16" icon="plus-circle" slot="prefix"></pl-icon>
@@ -43,10 +43,11 @@ export default class UserList extends PlForm {
                             </pl-flex-layout>
                             <pl-grid-column sortable field="code" header="Код" width="150" resizable></pl-grid-column>
                             <pl-grid-column sortable field="caption" header="Наименование"></pl-grid-column>
-                            <pl-grid-column width="50" action>
+                            <pl-grid-column width="90" action>
                                 <template>
                                     <pl-flex-layout>
-                                        <pl-icon-button iconset="pl-default" size="16" icon="trashcan" on-click="[[onDelRoleClick]]"></pl-icon-button>
+                                        <pl-icon-button variant="link" iconset="pl-default" size="16" icon="pencil" on-click="[[onEditRoleClick]]"></pl-icon-button>
+                                        <pl-icon-button variant="link" iconset="pl-default" size="16" icon="trashcan" on-click="[[onDelRoleClick]]"></pl-icon-button>
                                     </pl-flex-layout>
                                 </template>
                             </pl-grid-column>
@@ -120,7 +121,6 @@ export default class UserList extends PlForm {
                                 </pl-grid>
                             </pl-flex-layout>
                         </pl-tab>
-                        
                     </pl-tabpanel>
                 </pl-flex-layout>
             </pl-flex-layout>
@@ -154,6 +154,16 @@ export default class UserList extends PlForm {
 
     async onAddRoleClick() {
         await this.open('admin.roles.main');
+        this.$.dsRoles.execute()
+            .then(() => {
+                this.activeRole = this.roles[0];
+            });
+    }
+
+    async onEditRoleClick(event) {
+        await this.open('admin.roles.main', {
+            roleId: event.model.row.id
+        });
         this.$.dsRoles.execute()
             .then(() => {
                 this.activeRole = this.roles[0];

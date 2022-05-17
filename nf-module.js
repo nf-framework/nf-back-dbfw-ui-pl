@@ -5,7 +5,7 @@ import { registerCustomElementsDir } from '@nfjs/front-server';
 import { endpointHandlers } from '@nfjs/front-pl';
 import { endpointAccess } from './lib/endpoint-access.js';
 import { addUser, addUserRole, delUserRole, getPasswordPolicy, delUser } from './lib/users.js';
-import { addRole, delRole, checkRoleDelete, addMenuPerm, delMenuPerm, addUnitPriv, delUnitPriv, addUnitBpPriv, delUnitBpPriv } from './lib/roles.js';
+import { addRole, delRole, checkRoleDelete, addMenuPerm, delMenuPerm, addUnitPriv, delUnitPriv, addUnitBpPriv, delUnitBpPriv, getRole } from './lib/roles.js';
 
 const __dirname = path.join(path.dirname(decodeURI(new URL(import.meta.url).pathname))).replace(/^\\([A-Z]:\\)/, "$1");
 let menu = await api.loadJSON(__dirname + '/menu.json');
@@ -30,6 +30,7 @@ async function init() {
     web.on('POST', '/@nfjs/back-dbfw-ui-pl/delUserRole', { middleware: ['session', 'auth', 'json'] }, delUserRole);
 
     // roles
+    web.on('POST', '/@nfjs/back-dbfw-ui-pl/roles/getRole', { middleware: ['session', 'auth', 'json'] }, getRole);
     web.on('POST', '/@nfjs/back-dbfw-ui-pl/roles/addRole', { middleware: ['session', 'auth', 'json'] }, addRole);
     web.on('POST', '/@nfjs/back-dbfw-ui-pl/roles/delRole', { middleware: ['session', 'auth', 'json'] }, delRole);
     web.on('POST', '/@nfjs/back-dbfw-ui-pl/roles/checkRoleDelete', { middleware: ['session', 'auth', 'json'] }, checkRoleDelete);
