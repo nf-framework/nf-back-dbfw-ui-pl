@@ -40,7 +40,7 @@ export default class UserList extends PlForm {
                             <pl-grid-column width="50" action>
                                 <template>
                                     <pl-flex-layout>
-                                        <pl-icon-button iconset="pl-default" size="16" icon="trashcan" on-click="[[onDeleteUserClick]]"></pl-icon-button>
+                                        <pl-icon-button variant="link" iconset="pl-default" size="16" icon="trashcan" on-click="[[onDeleteUserClick]]"></pl-icon-button>
                                     </pl-flex-layout>
                                 </template>
                             </pl-grid-column>

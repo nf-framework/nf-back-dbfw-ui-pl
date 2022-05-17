@@ -11,7 +11,7 @@ export default class RoleList extends PlForm {
             unitList: { value: () => ([]), observer: '_unitlistObserver' },
             rolePrivs: { value: () => ([]), observer: '_rolePrivsObserver' },
             activeRolePrivs: { value: () => undefined, observer: '_activeRolePrivObserver' },
-            otherPrivs: { value: () => ([]), observer: '_othersRolePrivObserver'  },
+            otherPrivs: { value: () => ([]), observer: '_othersRolePrivObserver' },
             formTitle: {
                 type: String,
                 value: 'Роли'
@@ -174,7 +174,7 @@ export default class RoleList extends PlForm {
         if (val) {
             this.$.dsRoleUnitPrivs.execute({ role_id: this.activeRole.id })
                 .then((res) => {
-                    if(this.activeRolePrivs) {
+                    if (this.activeRolePrivs) {
                         this.$.dsRoleUnitPrivsOthers.execute({ role_id: this.activeRole.id, module: this.activeRolePrivs.unit })
                     }
                 });
@@ -341,8 +341,12 @@ export default class RoleList extends PlForm {
                             .then(() => {
                                 this._privsObserverFlag = false;
                                 this.splice('rolePrivs', privIndex, 1);
-                                this.set(`unitList.${unitlistIndex}.action`, false);
-                                this.set(`otherPrivs.${othersIndex}.exists`, false);
+                                if(unitlistIndex > -1) {
+                                    this.set(`unitList.${unitlistIndex}.action`, false);
+                                } 
+                                if (othersIndex> -1) {
+                                    this.set(`otherPrivs.${othersIndex}.exists`, false);
+                                }
                                 this._privsObserver = true;
 
                                 resolve();
@@ -362,8 +366,12 @@ export default class RoleList extends PlForm {
                     .then(() => {
                         this._privsObserverFlag = false;
                         this.splice('rolePrivs', privIndex, 1);
-                        this.set(`unitList.${unitlistIndex}.action`, false);
-                        this.set(`otherPrivs.${othersIndex}.exists`, false);
+                        if(unitlistIndex > -1) {
+                            this.set(`unitList.${unitlistIndex}.action`, false);
+                        }
+                        if (othersIndex > -1) {
+                            this.set(`otherPrivs.${othersIndex}.exists`, false);
+                        }
                         this._privsObserverFlag = true;
 
                         resolve();
