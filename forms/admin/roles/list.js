@@ -58,21 +58,21 @@ export default class RoleList extends PlForm {
                             <pl-flex-layout fit vertical>
                                 <pl-grid data="{{unitList}}" key-field="unit" pkey-field="mdl" class="main" selected="{{activeRolePrivs}}" tree>
                                 <pl-grid-column field="caption" header="Раздел"></pl-grid-column>
-                                <pl-grid-column width="75" header="Просмотр">
+                                <pl-grid-column width="80" header="Просмотр">
                                     <template>
                                         <pl-flex-layout fit justify="center">
                                             <pl-checkbox hidden="[[!row.is_module]]" variant="horizontal" checked="{{row.view}}"></pl-checkbox>
                                         </pl-flex-layout>
                                     </template>
                                 </pl-grid-column>
-                                <pl-grid-column width="75" header="Добавление">
+                                <pl-grid-column width="90" header="Добавление">
                                     <template>
                                         <pl-flex-layout fit justify="center">
                                             <pl-checkbox hidden="[[!row.is_module_add]]" variant="horizontal" checked="{{row.add}}"></pl-checkbox>
                                         </pl-flex-layout>
                                     </template>
                                 </pl-grid-column>
-                                <pl-grid-column width="75" header="Обновление">
+                                <pl-grid-column width="85" header="Обновление">
                                     <template>
                                         <pl-flex-layout fit justify="center">
                                             <pl-checkbox hidden="[[!row.is_module_upd]]" variant="horizontal" checked="{{row.upd}}"></pl-checkbox>
