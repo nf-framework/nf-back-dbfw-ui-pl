@@ -25,8 +25,10 @@ export default class JournalList extends PlForm {
         return html`
             <pl-flex-layout vertical fit>
                 <pl-flex-layout>
-                    <pl-icon-button iconset="pl-default" icon="repeat" on-click="[[refreshJournal]]"></pl-icon-button>
-                    <pl-button label="Настройка логов" variant="primary" on-click="[[showLogSettings]]">
+                    <pl-button label="Обновить" variant="primary" on-click="[[refreshJournal]]">
+                        <pl-icon slot="prefix" iconset="pl-default" icon="repeat"></pl-icon>
+                    </pl-button>
+                    <pl-button label="Настройка логов" variant="secondary" on-click="[[showLogSettings]]">
                         <pl-icon slot="prefix" iconset="pl-default" icon="settings"></pl-icon>
                     </pl-button>
                 </pl-flex-layout>
@@ -50,7 +52,7 @@ export default class JournalList extends PlForm {
                         </pl-grid-column>
                         <pl-flex-layout slot="top-toolbar" vertical>
                             <pl-filter-container id="fcJournal" data="{{journal}}">
-                                <pl-flex-layout>
+                                <pl-flex-layout wrap>
                                     <pl-filter-item field="ts_log" id="dateTimefrom" operator=">=">
                                         <pl-datetime label="Дата и время с"></pl-datetime>
                                     </pl-filter-item>
@@ -63,15 +65,17 @@ export default class JournalList extends PlForm {
                                     <pl-filter-item field="action" operator="=">
                                         <pl-combobox label="Действие" data="[[actions]]"></pl-combobox>
                                     </pl-filter-item>
-                                    <pl-filter-item field="row_id" operator="=">
-                                        <pl-input label="Id"></pl-input>
-                                    </pl-filter-item>
-                                    <pl-filter-item field="schemaname">
-                                        <pl-input label="Схема"></pl-input>
-                                    </pl-filter-item>
-                                    <pl-filter-item field="tablename">
-                                        <pl-input label="Раздел"></pl-input>
-                                    </pl-filter-item>
+                                    <pl-flex-layout>
+                                        <pl-filter-item field="row_id" operator="=">
+                                            <pl-input label="Id"></pl-input>
+                                        </pl-filter-item>
+                                        <pl-filter-item field="schemaname">
+                                            <pl-input label="Схема"></pl-input>
+                                        </pl-filter-item>
+                                        <pl-filter-item field="tablename">
+                                            <pl-input label="Раздел"></pl-input>
+                                        </pl-filter-item>
+                                    </pl-flex-layout>
                                 </pl-flex-layout>
                                 <label style="color: red;">Нижестоящие фильтры сильно нагружают базу данных</label>
                                 <pl-flex-layout>

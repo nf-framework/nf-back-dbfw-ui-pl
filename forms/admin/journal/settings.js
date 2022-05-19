@@ -1,4 +1,4 @@
-import { html } from "polylib";
+import { html, css } from "polylib";
 import { PlForm } from "@nfjs/front-pl/components/pl-form.js";
 
 export default class JournalSettings extends PlForm {
@@ -12,43 +12,50 @@ export default class JournalSettings extends PlForm {
         }
     }
 
+    static get css() {
+        return css`
+            pl-icon {
+                cursor: pointer;
+            }
+        `
+    }
+
     static get template() {
         return html`
-            <pl-flex-layout vertical fit>
-                <pl-flex-layout stretch justify="space-between">
-                    <pl-button label="Сохранить" variant="primary" disabled="[[!isChange]]" on-click="[[updData]]"></pl-button>
+            <pl-flex-layout fit>
+                <pl-grid data="{{journalFiltered}}" pkey-field="mdl" key-field="unit" tree>
+                    <pl-flex-layout stretch justify="space-between" slot="top-toolbar">
+                        <pl-button label="Сохранить" variant="primary" disabled="[[!isChange]]" on-click="[[updData]]"></pl-button>
                     <pl-input placeholder="Наименование раздела" value="{{filter}}">
-                        <pl-icon-button slot="suffix" icon="search" iconset="pl-default" variant="ghost" on-click="[[search]]"></pl-icon-button>
+                        <pl-icon slot="suffix" icon="search" iconset="pl-default" on-click="[[search]]"></pl-icon>
                     </pl-input>
                 </pl-flex-layout>
-                <pl-flex-layout fit>
-                    <pl-grid data="{{journalFiltered}}" pkey-field="mdl" key-field="unit" tree>
                         <pl-grid-column header="Имя раздела" field="caption" resizable></pl-grid-column>
                         <pl-grid-column header="Раздел" field="unit" resizable></pl-grid-column>
                         <pl-grid-column header="Добавление" width="250">
                             <template>
                                 <pl-radio-group selected="{{row.need_add}}" hidden="[[!row.mdl]]">
-                                    <pl-radio-button caption="Нет" name="n"></pl-radio-button>
-                                    <pl-radio-button caption="Да" name="y"></pl-radio-button>
-                                    <pl-radio-button caption="Да, с данными" name="f"></pl-radio-button>
+                                <pl-radio-button label="Нет" name="n"></pl-radio-button>
+                                <pl-radio-button label="Да" name="y"></pl-radio-button>
+                                <pl-radio-button label="С данными" name="f"></pl-radio-button>
                                 </pl-radio-group>
                             </template>
                         </pl-grid-column>
                         <pl-grid-column header="Удаление" width="250">
                             <template>
                                 <pl-radio-group selected="{{row.need_del}}" hidden="[[!row.mdl]]">
-                                    <pl-radio-button caption="Нет" name="n"></pl-radio-button>
-                                    <pl-radio-button caption="Да" name="y"></pl-radio-button>
-                                    <pl-radio-button caption="Да, с данными" name="f"></pl-radio-button>
+                                <pl-radio-button label="Нет" name="n"></pl-radio-button>
+                                <pl-radio-button label="Да" name="y"></pl-radio-button>
+                                <pl-radio-button label="С данными" name="f"></pl-radio-button>
                                 </pl-radio-group>
                             </template>
                         </pl-grid-column>
                         <pl-grid-column header="Изменение" width="250">
                             <template>
                                 <pl-radio-group selected="{{row.need_upd}}" hidden="[[!row.mdl]]">
-                                    <pl-radio-button caption="Нет" name="n"></pl-radio-button>
-                                    <pl-radio-button caption="Да" name="y"></pl-radio-button>
-                                    <pl-radio-button caption="Да, с данными" name="f"></pl-radio-button>
+                                <pl-radio-button label="Нет" name="n"></pl-radio-button>
+                                <pl-radio-button label="Да" name="y"></pl-radio-button>
+                                <pl-radio-button label="С данными" name="f"></pl-radio-button>
                                 </pl-radio-group>
                             </template>
                         </pl-grid-column>
@@ -66,7 +73,7 @@ export default class JournalSettings extends PlForm {
             await this.$.dsJournal.execute();
             this.journalFiltered = this.journal;
             this.obsSet();
-        },0);
+        }, 0);
     }
 
     obsSet() {
@@ -75,7 +82,7 @@ export default class JournalSettings extends PlForm {
     }
 
     async updData() {
-        await this.$.aSave.execute({journal: this.journalFiltered});
+        await this.$.aSave.execute({ journal: this.journalFiltered });
         this.obsSet();
     }
 
