@@ -347,7 +347,7 @@ export default class RoleList extends PlForm {
                                 if (othersIndex> -1) {
                                     this.set(`otherPrivs.${othersIndex}.exists`, false);
                                 }
-                                this._privsObserver = true;
+                                this._privsObserverFlag = true;
 
                                 resolve();
                             })
