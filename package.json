@@ -1,6 +1,6 @@
 {
     "name": "@nfjs/back-dbfw-ui-pl",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "UI for back-dbfw",
     "license": "MIT",
     "type": "module",
@@ -23,7 +23,7 @@
     "dependencies": {
         "@nfjs/front-pl": "^1.0.0",
         "@nfjs/core": "^1.0.0",
-        "@nfjs/back-dbfw": "^1.0.0",
+        "@nfjs/back-dbfw": "^1.0.2",
         "@nfjs/back": "^1.0.0"
     },
     "exports": {
