@@ -60,37 +60,27 @@ export default class RoleList extends PlForm {
                                 <pl-grid-column field="caption" header="Раздел"></pl-grid-column>
                                 <pl-grid-column width="80" header="Просмотр">
                                     <template>
-                                        <pl-flex-layout fit justify="center">
                                             <pl-checkbox hidden="[[!row.is_module]]" variant="horizontal" checked="{{row.view}}"></pl-checkbox>
-                                        </pl-flex-layout>
                                     </template>
                                 </pl-grid-column>
                                 <pl-grid-column width="90" header="Добавление">
                                     <template>
-                                        <pl-flex-layout fit justify="center">
                                             <pl-checkbox hidden="[[!row.is_module_add]]" variant="horizontal" checked="{{row.add}}"></pl-checkbox>
-                                        </pl-flex-layout>
                                     </template>
                                 </pl-grid-column>
                                 <pl-grid-column width="85" header="Обновление">
                                     <template>
-                                        <pl-flex-layout fit justify="center">
                                             <pl-checkbox hidden="[[!row.is_module_upd]]" variant="horizontal" checked="{{row.upd}}"></pl-checkbox>
-                                        </pl-flex-layout>
                                     </template>
                                 </pl-grid-column>
                                 <pl-grid-column width="75" header="Удаление">
                                     <template>
-                                        <pl-flex-layout fit justify="center">
                                             <pl-checkbox hidden="[[!row.is_module_del]]" variant="horizontal" checked="{{row.del}}"></pl-checkbox>
-                                        </pl-flex-layout>
                                     </template>
                                 </pl-grid-column>
                                 <pl-grid-column width="75" header="Другое">
                                     <template>
-                                        <pl-flex-layout fit justify="center">
                                             <span hidden$="[[!row.is_others]]"> + </span>
-                                        </pl-flex-layout>
                                     </template>
                                 </pl-grid-column>
                             </pl-grid>
@@ -99,9 +89,7 @@ export default class RoleList extends PlForm {
                                 <pl-grid-column field="caption" header="Наименование"></pl-grid-column>
                                 <pl-grid-column width="85">
                                     <template>
-                                        <pl-flex-layout fit justify="center">
                                             <pl-checkbox variant="horizontal" checked="{{row.exists}}"></pl-checkbox>
-                                        </pl-flex-layout>
                                     </template>
                                 </pl-grid-column>
                             </pl-grid>
@@ -113,9 +101,7 @@ export default class RoleList extends PlForm {
                                     <pl-grid-column field="caption" header="Наименование пункта меню"></pl-grid-column>
                                     <pl-grid-column width="100">
                                         <template>
-                                            <pl-flex-layout fit justify="center">
                                                 <pl-checkbox variant="horizontal" checked="{{row.exists}}" hidden="[[!row.guid]]"></pl-checkbox>
-                                            </pl-flex-layout>
                                         </template>
                                     </pl-grid-column>
                                 </pl-grid>
@@ -143,41 +129,31 @@ export default class RoleList extends PlForm {
             <pl-action id="aDelUnitBpPriv" endpoint="@nfjs/back-dbfw-ui-pl/roles/delUnitBpPriv"></pl-action>
 		`;
     }
-    onConnect() {
-        this.$.dsRoles.execute()
-            .then(() => {
-                this.activeRole = this.roles[0];
-            });
-        this.$.dsUnitList.execute();
+    async onConnect() {
         this.$.dsFullMenu.execute();
+        await this.$.dsRoles.execute()
+        await this.$.dsUnitList.execute();
+        this.activeRole = this.roles[0];
     }
 
     async onAddRoleClick() {
         await this.open('admin.roles.main');
-        this.$.dsRoles.execute()
-            .then(() => {
-                this.activeRole = this.roles[0];
-            });
+        await this.$.dsRoles.execute();
+        this.activeRole = this.roles[0];
     }
 
     async onEditRoleClick(event) {
-        await this.open('admin.roles.main', {
-            roleId: event.model.row.id
-        });
-        this.$.dsRoles.execute()
-            .then(() => {
-                this.activeRole = this.roles[0];
-            });
+        await this.open('admin.roles.main', { roleId: event.model.row.id });
+        await this.$.dsRoles.execute();
+        this.activeRole = this.roles[0];
     }
 
-    _activeRoleObserver(val) {
+    async _activeRoleObserver(val) {
         if (val) {
-            this.$.dsRoleUnitPrivs.execute({ role_id: this.activeRole.id })
-                .then((res) => {
-                    if (this.activeRolePrivs) {
-                        this.$.dsRoleUnitPrivsOthers.execute({ role_id: this.activeRole.id, module: this.activeRolePrivs.unit })
-                    }
-                });
+            await this.$.dsRoleUnitPrivs.execute({ role_id: this.activeRole.id });
+            if (this.activeRolePrivs) {
+                this.$.dsRoleUnitPrivsOthers.execute({ role_id: this.activeRole.id, module: this.activeRolePrivs.unit });
+            }
             this.$.dsMenuPerm.execute({ role_id: val.id });
         }
     }
@@ -196,18 +172,27 @@ export default class RoleList extends PlForm {
         }
     }
 
-    _rolePrivsObserver(data) {
-        if (this._privsObserverFlag === false) return;
-
+    _rolePrivsObserver(data, old, m) {
         this._unitlistObserverFlag = false;
         this._othersObserverFlag = false;
-        for (let index = 0, n = this.unitList.length; index < n; index++) {
-            const item = this.unitList[index];
-            const privs = this.rolePrivs.filter(i => i.unit === item.unit)
-            this.set(`unitList.${index}.view`, !!privs.find(p => p.action === 'view'));
-            this.set(`unitList.${index}.add`, !!privs.find(p => p.action === 'add'));
-            this.set(`unitList.${index}.upd`, !!privs.find(p => p.action === 'upd'));
-            this.set(`unitList.${index}.del`, !!privs.find(p => p.action === 'del'));
+        if (m.action === 'splice') {
+            m.added?.forEach( i => {
+                let r = this.unitList.findIndex( u => u.unit === i.unit);
+                if (r>=0) this.set(`unitList.${r}.${i.action}`, true);
+            });
+            m.deleted?.forEach( i => {
+                let r = this.unitList.findIndex( u => u.unit === i.unit);
+                if (r>=0) this.set(`unitList.${r}.${i.action}`, false);
+            })
+        } else {
+            for (let index = 0, n = this.unitList.length; index < n; index++) {
+                const item = this.unitList[index];
+                const privs = this.rolePrivs.filter(i => i.unit === item.unit)
+                this.set(`unitList.${index}.view`, !!privs.find(p => p.action === 'view'));
+                this.set(`unitList.${index}.add`, !!privs.find(p => p.action === 'add'));
+                this.set(`unitList.${index}.upd`, !!privs.find(p => p.action === 'upd'));
+                this.set(`unitList.${index}.del`, !!privs.find(p => p.action === 'del'));
+            }
         }
 
         this._unitlistObserverFlag = true;
@@ -318,71 +303,37 @@ export default class RoleList extends PlForm {
             }
         });
     }
+    async fDelPriv(id, bp = false ) {
+        if (bp) {
+            await this.$.aDelUnitBpPriv.execute({id});
+        } else {
+            await this.$.aDelUnitPriv.execute({id});
+        }
+        this._privsObserverFlag = false;
+        const privIndex = this.rolePrivs.findIndex(item => item.id == id );
+        this.splice('rolePrivs', privIndex, 1);
+        this._privsObserverFlag = true;
+    }
 
-    delPriv(unit, action) {
-        return new Promise((resolve, reject) => {
-            const unitlistIndex = this.unitList.findIndex((item) => item.unit === unit);
-            const othersIndex = this.otherPrivs.findIndex((item) => item.unit === unit && item.action === action);
-            const privIndex = this.rolePrivs.findIndex(item => item.unit === unit && item.action === action);
-            const priv = this.rolePrivs[privIndex];
+    async delPriv(unit, action) {
 
-            if (!priv) {
-                resolve();
-                return;
-            }
-
+        try {
             if (action === 'view') {
-                const acts = this.rolePrivs.filter(item => item.unit === unit && item.action !== 'view');
-                const promises = acts.map((i) => this.delPriv(i.unit, i.action));
-
-                Promise.all(promises)
-                    .then(() => {
-                        this.$.aDelUnitPriv.execute({ id: priv.id })
-                            .then(() => {
-                                this._privsObserverFlag = false;
-                                this.splice('rolePrivs', privIndex, 1);
-                                if(unitlistIndex > -1) {
-                                    this.set(`unitList.${unitlistIndex}.action`, false);
-                                } 
-                                if (othersIndex> -1) {
-                                    this.set(`otherPrivs.${othersIndex}.exists`, false);
-                                }
-                                this._privsObserverFlag = true;
-
-                                resolve();
-                            })
-                            .catch((e) => {
-                                console.error('error', e);
-                                this.$.dsRoleUnitPrivs.execute({ role_id: this.activeRole.id })
-                                reject();
-                            });
-                    })
-                    .catch((e) => {
-                        console.error('error', e);
-                        this.$.dsRoleUnitPrivs.execute({ role_id: this.activeRole.id })
-                    });
+                let acts = this.rolePrivs.filter(item => item.unit === unit && item.action !== 'view');
+                let promises = acts.map((i) => this.fDelPriv(i.id, true));
+                await Promise.all(promises);
+                let priv = this.rolePrivs.find(i => i.unit === unit && i.action === action);
+                this.fDelPriv(priv.id);
             } else {
-                this.$.aDelUnitBpPriv.execute({ id: priv.id })
-                    .then(() => {
-                        this._privsObserverFlag = false;
-                        this.splice('rolePrivs', privIndex, 1);
-                        if(unitlistIndex > -1) {
-                            this.set(`unitList.${unitlistIndex}.action`, false);
-                        }
-                        if (othersIndex > -1) {
-                            this.set(`otherPrivs.${othersIndex}.exists`, false);
-                        }
-                        this._privsObserverFlag = true;
-
-                        resolve();
-                    })
-                    .catch((e) => {
-                        console.error('error', e);
-                        this.$.dsRoleUnitPrivs.execute({ role_id: this.activeRole.id })
-                        reject();
-                    });
+                let priv = this.rolePrivs.find(i => i.unit === unit && i.action === action);
+                if (!priv) return;
+                await this.fDelPriv(priv.id, true)
             }
-        });
+        } catch (e) {
+            console.error('error', e);
+            this.$.dsRoleUnitPrivs.execute({ role_id: this.activeRole.id });
+        }
+
     }
 
     async onDelRoleClick(event) {
