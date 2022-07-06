@@ -176,14 +176,14 @@ export default class RoleList extends PlForm {
         this._unitlistObserverFlag = false;
         this._othersObserverFlag = false;
         if (m.action === 'splice') {
+            m.deleted?.forEach( i => {
+                let r = this.unitList.findIndex( u => u.unit === i.unit);
+                if (r>=0) this.set(`unitList.${r}.${i.action}`, false);
+            });
             m.added?.forEach( i => {
                 let r = this.unitList.findIndex( u => u.unit === i.unit);
                 if (r>=0) this.set(`unitList.${r}.${i.action}`, true);
             });
-            m.deleted?.forEach( i => {
-                let r = this.unitList.findIndex( u => u.unit === i.unit);
-                if (r>=0) this.set(`unitList.${r}.${i.action}`, false);
-            })
         } else {
             for (let index = 0, n = this.unitList.length; index < n; index++) {
                 const item = this.unitList[index];
