@@ -32,8 +32,7 @@ export default class RoleList extends PlForm {
 
     static get template() {
         return html`
-            <pl-flex-layout fit vertical>
-                <pl-flex-layout fit>
+            <pl-flex-layout fit >
                     <pl-flex-layout fit>
                         <pl-grid data="{{roles}}" selected="{{activeRole}}" on-row-dblclick="[[onEditRoleClick]]">
                             <pl-flex-layout slot="top-toolbar">
@@ -53,6 +52,7 @@ export default class RoleList extends PlForm {
                             </pl-grid-column>
                         </pl-grid>
                     </pl-flex-layout>
+                    <pl-flex-layout fit>
                     <pl-tabpanel>
                         <pl-tab header="Разделы и действия">
                             <pl-flex-layout fit vertical>
@@ -108,7 +108,8 @@ export default class RoleList extends PlForm {
                             </pl-flex-layout>
                         </pl-tab>
                     </pl-tabpanel>
-                </pl-flex-layout>
+
+                    </pl-flex-layout>
             </pl-flex-layout>
             <pl-dataset id="dsRoles" data="{{roles}}" endpoint="/@nfjs/back/endpoint-sql/dbfw.roles.roles"></pl-dataset>
             <pl-dataset id="dsUnitList" data="{{unitList}}" endpoint="/@nfjs/back/endpoint-sql/dbfw.roles.unit_list" type="sql-endpoint"></pl-dataset>
