@@ -2,135 +2,129 @@ import { html, css } from "polylib";
 import { PlForm } from "@nfjs/front-pl/components/pl-form.js";
 
 export default class RoleList extends PlForm {
-    static get properties() {
-        return {
-            menuList: { value: () => ([]), observer: '_menuListObserver' },
-            menuPermList: { value: () => ([]), observer: '_menuPermObserver' },
-            roles: { value: () => ([]) },
-            activeRole: { value: () => undefined, observer: '_activeRoleObserver' },
-            unitList: { value: () => ([]), observer: '_unitlistObserver' },
-            rolePrivs: { value: () => ([]), observer: '_rolePrivsObserver' },
-            activeRolePrivs: { value: () => undefined, observer: '_activeRolePrivObserver' },
-            otherPrivs: { value: () => ([]), observer: '_othersRolePrivObserver' },
-            formTitle: {
-                type: String,
-                value: 'Роли'
-            }
+    static properties = {
+        menuList: { value: () => ([]), observer: '_menuListObserver' },
+        menuPermList: { value: () => ([]), observer: '_menuPermObserver' },
+        roles: { value: () => ([]) },
+        activeRole: { value: () => undefined, observer: '_activeRoleObserver' },
+        unitList: { value: () => ([]), observer: '_unitlistObserver' },
+        rolePrivs: { value: () => ([]), observer: '_rolePrivsObserver' },
+        activeRolePrivs: { value: () => undefined, observer: '_activeRolePrivObserver' },
+        otherPrivs: { value: () => ([]), observer: '_othersRolePrivObserver' },
+        formTitle: {
+            type: String,
+            value: 'Роли'
         }
     }
 
-    static get css() {
-        return css`
-            .main {
-                flex: 2;
-            }
-            .others {
-                flex: 1;
-            }
-        `
-    }
+    static css = css`
+        .main {
+            flex: 2;
+        }
+        .others {
+            flex: 1;
+        }
+    `;
 
-    static get template() {
-        return html`
-            <pl-flex-layout fit >
-                    <pl-flex-layout fit>
-                        <pl-grid data="{{roles}}" selected="{{activeRole}}" on-row-dblclick="[[onEditRoleClick]]">
-                            <pl-flex-layout slot="top-toolbar">
-                                <pl-button variant="primary" label="Добавить" on-click="[[onAddRoleClick]]">
-                                    <pl-icon iconset="pl-default" size="16" icon="plus-circle" slot="prefix"></pl-icon>
-                                </pl-button>
-                            </pl-flex-layout>
-                            <pl-grid-column sortable field="code" header="Код" width="150" resizable></pl-grid-column>
-                            <pl-grid-column sortable field="caption" header="Наименование"></pl-grid-column>
-                            <pl-grid-column width="90" action>
+    static template = html`
+        <pl-flex-layout fit >
+                <pl-flex-layout fit>
+                    <pl-grid data="{{roles}}" selected="{{activeRole}}" on-row-dblclick="[[onEditRoleClick]]">
+                        <pl-flex-layout slot="top-toolbar">
+                            <pl-button variant="primary" label="Добавить" on-click="[[onAddRoleClick]]">
+                                <pl-icon iconset="pl-default" size="16" icon="plus-circle" slot="prefix"></pl-icon>
+                            </pl-button>
+                        </pl-flex-layout>
+                        <pl-grid-column sortable field="code" header="Код" width="150" resizable></pl-grid-column>
+                        <pl-grid-column sortable field="caption" header="Наименование"></pl-grid-column>
+                        <pl-grid-column width="90" action>
+                            <template>
+                                <pl-flex-layout>
+                                    <pl-icon-button variant="link" iconset="pl-default" size="16" icon="pencil" on-click="[[onEditRoleClick]]"></pl-icon-button>
+                                    <pl-icon-button variant="link" iconset="pl-default" size="16" icon="trashcan" on-click="[[onDelRoleClick]]"></pl-icon-button>
+                                </pl-flex-layout>
+                            </template>
+                        </pl-grid-column>
+                    </pl-grid>
+                </pl-flex-layout>
+                <pl-flex-layout fit>
+                <pl-tabpanel>
+                    <pl-tab header="Разделы и действия">
+                        <pl-flex-layout fit vertical>
+                            <pl-grid data="{{unitList}}" key-field="unit" pkey-field="mdl" class="main" selected="{{activeRolePrivs}}" tree>
+                            <pl-grid-column field="caption" header="Раздел"></pl-grid-column>
+                            <pl-grid-column width="80" header="Просмотр">
                                 <template>
-                                    <pl-flex-layout>
-                                        <pl-icon-button variant="link" iconset="pl-default" size="16" icon="pencil" on-click="[[onEditRoleClick]]"></pl-icon-button>
-                                        <pl-icon-button variant="link" iconset="pl-default" size="16" icon="trashcan" on-click="[[onDelRoleClick]]"></pl-icon-button>
-                                    </pl-flex-layout>
+                                    <pl-checkbox hidden="[[!row.is_module]]" checked="{{row.view}}"></pl-checkbox>
+                                </template>
+                            </pl-grid-column>
+                            <pl-grid-column width="90" header="Добавление">
+                                <template>
+                                    <pl-checkbox hidden="[[!row.is_module_add]]" checked="{{row.add}}"></pl-checkbox>
+                                </template>
+                            </pl-grid-column>
+                            <pl-grid-column width="85" header="Обновление">
+                                <template>
+                                    <pl-checkbox hidden="[[!row.is_module_upd]]" checked="{{row.upd}}"></pl-checkbox>
+                                </template>
+                            </pl-grid-column>
+                            <pl-grid-column width="75" header="Удаление">
+                                <template>
+                                    <pl-checkbox hidden="[[!row.is_module_del]]" checked="{{row.del}}"></pl-checkbox>
+                                </template>
+                            </pl-grid-column>
+                            <pl-grid-column width="75" header="Другое">
+                                <template>
+                                        <span hidden$="[[!row.is_others]]"> + </span>
                                 </template>
                             </pl-grid-column>
                         </pl-grid>
-                    </pl-flex-layout>
-                    <pl-flex-layout fit>
-                    <pl-tabpanel>
-                        <pl-tab header="Разделы и действия">
-                            <pl-flex-layout fit vertical>
-                                <pl-grid data="{{unitList}}" key-field="unit" pkey-field="mdl" class="main" selected="{{activeRolePrivs}}" tree>
-                                <pl-grid-column field="caption" header="Раздел"></pl-grid-column>
-                                <pl-grid-column width="80" header="Просмотр">
+                        <pl-grid class="others" data="{{otherPrivs}}">
+                            <pl-grid-column field="action" header="Действие"></pl-grid-column>
+                            <pl-grid-column field="caption" header="Наименование"></pl-grid-column>
+                            <pl-grid-column width="85">
+                                <template>
+                                        <pl-checkbox checked="{{row.exists}}"></pl-checkbox>
+                                </template>
+                            </pl-grid-column>
+                        </pl-grid>
+                        </pl-flex-layout>
+                    </pl-tab>
+                    <pl-tab header="Главное меню">
+                        <pl-flex-layout fit>
+                            <pl-grid data="{{menuList}}" key-field="id" pkey-field="pid" tree>
+                                <pl-grid-column field="caption" header="Наименование пункта меню"></pl-grid-column>
+                                <pl-grid-column width="100">
                                     <template>
-                                            <pl-checkbox hidden="[[!row.is_module]]" variant="horizontal" checked="{{row.view}}"></pl-checkbox>
-                                    </template>
-                                </pl-grid-column>
-                                <pl-grid-column width="90" header="Добавление">
-                                    <template>
-                                            <pl-checkbox hidden="[[!row.is_module_add]]" variant="horizontal" checked="{{row.add}}"></pl-checkbox>
-                                    </template>
-                                </pl-grid-column>
-                                <pl-grid-column width="85" header="Обновление">
-                                    <template>
-                                            <pl-checkbox hidden="[[!row.is_module_upd]]" variant="horizontal" checked="{{row.upd}}"></pl-checkbox>
-                                    </template>
-                                </pl-grid-column>
-                                <pl-grid-column width="75" header="Удаление">
-                                    <template>
-                                            <pl-checkbox hidden="[[!row.is_module_del]]" variant="horizontal" checked="{{row.del}}"></pl-checkbox>
-                                    </template>
-                                </pl-grid-column>
-                                <pl-grid-column width="75" header="Другое">
-                                    <template>
-                                            <span hidden$="[[!row.is_others]]"> + </span>
+                                            <pl-checkbox checked="{{row.exists}}" hidden="[[!row.guid]]"></pl-checkbox>
                                     </template>
                                 </pl-grid-column>
                             </pl-grid>
-                            <pl-grid class="others" data="{{otherPrivs}}">
-                                <pl-grid-column field="action" header="Действие"></pl-grid-column>
-                                <pl-grid-column field="caption" header="Наименование"></pl-grid-column>
-                                <pl-grid-column width="85">
-                                    <template>
-                                            <pl-checkbox variant="horizontal" checked="{{row.exists}}"></pl-checkbox>
-                                    </template>
-                                </pl-grid-column>
-                            </pl-grid>
-                            </pl-flex-layout>
-                        </pl-tab>
-                        <pl-tab header="Главное меню">
-                            <pl-flex-layout fit>
-                                <pl-grid data="{{menuList}}" key-field="id" pkey-field="pid" tree>
-                                    <pl-grid-column field="caption" header="Наименование пункта меню"></pl-grid-column>
-                                    <pl-grid-column width="100">
-                                        <template>
-                                                <pl-checkbox variant="horizontal" checked="{{row.exists}}" hidden="[[!row.guid]]"></pl-checkbox>
-                                        </template>
-                                    </pl-grid-column>
-                                </pl-grid>
-                            </pl-flex-layout>
-                        </pl-tab>
-                    </pl-tabpanel>
-
-                    </pl-flex-layout>
+                        </pl-flex-layout>
+                    </pl-tab>
+                </pl-tabpanel>
             </pl-flex-layout>
-            <pl-dataset id="dsRoles" data="{{roles}}" endpoint="/@nfjs/back/endpoint-sql/dbfw.roles.roles"></pl-dataset>
-            <pl-dataset id="dsUnitList" data="{{unitList}}" endpoint="/@nfjs/back/endpoint-sql/dbfw.roles.unit_list" type="sql-endpoint"></pl-dataset>
-            <pl-dataset id="dsRoleUnitPrivs" data="{{rolePrivs}}" endpoint="/@nfjs/back/endpoint-sql/dbfw.roles.role_unit_privs" type="sql-endpoint"></pl-dataset>
-            <pl-dataset id="dsRoleUnitPrivsOthers" data="{{otherPrivs}}" endpoint="/@nfjs/back/endpoint-sql/dbfw.roles.role_unit_privs_others" type="sql-endpoint"></pl-dataset>
-            <pl-dataset id="dsFullMenu" data="{{menuList}}" endpoint="/front/action/getFullMenu"></pl-dataset>
-            <pl-dataset id="dsMenuPerm" data="{{menuPermList}}" endpoint="/@nfjs/back/endpoint-sql/dbfw.roles.menu_perm" type="sql-endpoint"></pl-dataset>
-            
-            <pl-action id="aCheckRoleDel" endpoint="@nfjs/back-dbfw-ui-pl/roles/checkRoleDelete"></pl-action>
-            <pl-action id="aDelRole" endpoint="@nfjs/back-dbfw-ui-pl/roles/delRole"></pl-action>
-            
-            <pl-action id="aAddMenuPerm" endpoint="@nfjs/back-dbfw-ui-pl/roles/addMenuPerm"></pl-action>
-            <pl-action id="aDelMenuPerm" endpoint="@nfjs/back-dbfw-ui-pl/roles/delMenuPerm"></pl-action>
-            
-            <pl-action id="aAddUnitPriv" endpoint="@nfjs/back-dbfw-ui-pl/roles/addUnitPriv"></pl-action>
-            <pl-action id="aDelUnitPriv" endpoint="@nfjs/back-dbfw-ui-pl/roles/delUnitPriv"></pl-action>
-            <pl-action id="aAddUnitBpPriv" endpoint="@nfjs/back-dbfw-ui-pl/roles/addUnitBpPriv"></pl-action>
-            <pl-action id="aDelUnitBpPriv" endpoint="@nfjs/back-dbfw-ui-pl/roles/delUnitBpPriv"></pl-action>
-		`;
-    }
-    async onConnect() {
+        </pl-flex-layout>
+        <pl-dataset id="dsRoles" data="{{roles}}" endpoint="/@nfjs/back/endpoint-sql/dbfw.roles.roles"></pl-dataset>
+        <pl-dataset id="dsUnitList" data="{{unitList}}" endpoint="/@nfjs/back/endpoint-sql/dbfw.roles.unit_list" type="sql-endpoint"></pl-dataset>
+        <pl-dataset id="dsRoleUnitPrivs" data="{{rolePrivs}}" endpoint="/@nfjs/back/endpoint-sql/dbfw.roles.role_unit_privs" type="sql-endpoint"></pl-dataset>
+        <pl-dataset id="dsRoleUnitPrivsOthers" data="{{otherPrivs}}" endpoint="/@nfjs/back/endpoint-sql/dbfw.roles.role_unit_privs_others" type="sql-endpoint"></pl-dataset>
+        <pl-dataset id="dsFullMenu" data="{{menuList}}" endpoint="/front/action/getFullMenu"></pl-dataset>
+        <pl-dataset id="dsMenuPerm" data="{{menuPermList}}" endpoint="/@nfjs/back/endpoint-sql/dbfw.roles.menu_perm" type="sql-endpoint"></pl-dataset>
+        
+        <pl-action id="aCheckRoleDel" endpoint="@nfjs/back-dbfw-ui-pl/roles/checkRoleDelete"></pl-action>
+        <pl-action id="aDelRole" endpoint="@nfjs/back-dbfw-ui-pl/roles/delRole"></pl-action>
+        
+        <pl-action id="aAddMenuPerm" endpoint="@nfjs/back-dbfw-ui-pl/roles/addMenuPerm"></pl-action>
+        <pl-action id="aDelMenuPerm" endpoint="@nfjs/back-dbfw-ui-pl/roles/delMenuPerm"></pl-action>
+        
+        <pl-action id="aAddUnitPriv" endpoint="@nfjs/back-dbfw-ui-pl/roles/addUnitPriv"></pl-action>
+        <pl-action id="aDelUnitPriv" endpoint="@nfjs/back-dbfw-ui-pl/roles/delUnitPriv"></pl-action>
+        <pl-action id="aAddUnitBpPriv" endpoint="@nfjs/back-dbfw-ui-pl/roles/addUnitBpPriv"></pl-action>
+        <pl-action id="aDelUnitBpPriv" endpoint="@nfjs/back-dbfw-ui-pl/roles/delUnitBpPriv"></pl-action>
+    `;
+
+async onConnect() {
         this.$.dsFullMenu.execute();
         await this.$.dsRoles.execute()
         await this.$.dsUnitList.execute();

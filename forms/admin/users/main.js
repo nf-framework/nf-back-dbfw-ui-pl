@@ -2,71 +2,62 @@ import { html, css } from "polylib";
 import { PlForm } from "@nfjs/front-pl/components/pl-form.js";
 
 export default class SubscriberEdit extends PlForm {
-    static get properties() {
-        return {
-            user: {
-                type: Object,
-                value: () => ({
-                    username: undefined,
-                    fullname: undefined,
-                    password: undefined,
-                    password2: undefined
-                }),
-                observer: '_userObserver'
-            },
-            invalid: {
-                value: false
-            },
-            checks: {
-                type: Array,
-                value: () => ([])
-            },
-            passwordPolicy: {
-                type: Object,
-                value: () => ({})
-            },
-            formTitle: {
-                type: String,
-                value: 'Добавление / редактирование пользователя'
-            }
+    static properties = {
+        user: {
+            type: Object,
+            value: () => ({
+                username: undefined,
+                fullname: undefined,
+                password: undefined,
+                password2: undefined
+            }),
+            observer: '_userObserver'
+        },
+        invalid: {
+            value: false
+        },
+        checks: {
+            type: Array,
+            value: () => ([])
+        },
+        passwordPolicy: {
+            type: Object,
+            value: () => ({})
+        },
+        formTitle: {
+            type: String,
+            value: 'Добавление / редактирование пользователя'
         }
     }
 
-    static get css(){
-        return css`
-            .error {
-                color: var(--negative-base);
-            }
-        `;
-    }
+    static css = css`
+        .error {
+            color: var(--negative-base);
+        }
+    `;
 
-    static get template() {
-        return html`
-            <pl-valid-observer invalid="{{invalid}}"></pl-valid-observer>
-            <pl-flex-layout scrollable fit vertical>
-                <pl-input variant="horizontal" label="Имя пользователя" required value="{{user.username}}">
-                </pl-input>
-                <pl-input variant="horizontal" label="Фамилия Имя Отчество" required value="{{user.fullname}}"></pl-input>
-                <pl-input variant="horizontal" type="password" label="Пароль" required value="{{user.password}}"></pl-input>
-                <pl-input variant="horizontal" type="password" label="Подтвердите пароль" required value="{{user.password2}}"></pl-input>
-                <pl-repeat items="[[checks]]">
-                    <template>
-                        <span class="error">[[item]]<span>
-                    </template>
-                </pl-repeat>
-                <pl-flex-layout>
-                    <pl-button label="Сохранить" variant="primary" disabled="[[computeDisabled(invalid,checks)]]" on-click="[[onSaveClick]]">
-                        <pl-icon iconset="pl-default" size="16" icon="save" slot="suffix"></pl-icon>
-                    </pl-button>
-                    <pl-button label="Отменить" variant="secondary" on-click="[[close]]">
-                        <pl-icon iconset="pl-default" size="16" icon="close-circle" slot="suffix"></pl-icon>
-                    </pl-button>
-                </pl-flex-layout>
+    static template = html`
+        <pl-valid-observer invalid="{{invalid}}"></pl-valid-observer>
+        <pl-flex-layout scrollable fit vertical>
+            <pl-input orientation="horizontal" label="Имя пользователя" required value="{{user.username}}"></pl-input>
+            <pl-input orientation="horizontal" label="Фамилия Имя Отчество" required value="{{user.fullname}}"></pl-input>
+            <pl-input orientation="horizontal" type="password" label="Пароль" required value="{{user.password}}"></pl-input>
+            <pl-input orientation="horizontal" type="password" label="Подтвердите пароль" required value="{{user.password2}}"></pl-input>
+                <template d:repeat="[[checks]]">
+                    <span class="error">[[item]]<span>
+                </template>
+            <pl-flex-layout>
+                <pl-button label="Сохранить" variant="primary" disabled="[[computeDisabled(invalid,checks)]]" on-click="[[onSaveClick]]">
+                    <pl-icon iconset="pl-default" size="16" icon="save" slot="suffix"></pl-icon>
+                </pl-button>
+                <pl-button label="Отменить" variant="secondary" on-click="[[close]]">
+                    <pl-icon iconset="pl-default" size="16" icon="close-circle" slot="suffix"></pl-icon>
+                </pl-button>
             </pl-flex-layout>
-            <pl-action id="getPasswordPolicy" endpoint="@nfjs/back-dbfw-ui-pl/getPasswordPolicy" data="{{passwordPolicy}}"></pl-action>
-            <pl-action id="aSave" endpoint="@nfjs/back-dbfw-ui-pl/addUser"></pl-action>
-        `;
-    }
+        </pl-flex-layout>
+        <pl-action id="getPasswordPolicy" endpoint="@nfjs/back-dbfw-ui-pl/getPasswordPolicy" data="{{passwordPolicy}}"></pl-action>
+        <pl-action id="aSave" endpoint="@nfjs/back-dbfw-ui-pl/addUser"></pl-action>
+    `;
 
     onConnect(){
         this.$.getPasswordPolicy.execute();

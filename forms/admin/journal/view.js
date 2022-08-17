@@ -2,41 +2,37 @@ import { html } from "polylib";
 import { PlForm } from "@nfjs/front-pl/components/pl-form.js";
 
 export default class JournalView extends PlForm {
-    static get properties() {
-        return {
-            formTitle: { type: String, value: 'Просмотр записи журнала' },
-            data: { value: () => ({}) },
-        }
+    static properties ={
+        formTitle: { type: String, value: 'Просмотр записи журнала' },
+        data: { value: () => ({}) },
     }
 
-    static get template() {
-        return html`
-            <pl-flex-layout vertical fit>
-                <pl-flex-layout vertical>
-                    <pl-labeled-container label="Схема" variant="horizontal">[[data.schemaname]]</pl-labeled-container>
-                    <pl-labeled-container label="Раздел" variant="horizontal">[[data.tablename]]</pl-labeled-container>
-                    <pl-labeled-container label="Пользователь" variant="horizontal">[[data.session_user_name]]</pl-labeled-container>
-                    <pl-labeled-container label="Дата и время" variant="horizontal">[[data.ts_log]]</pl-labeled-container>
-                    <pl-labeled-container label="IP-адрес пользователя" variant="horizontal">[[data.client_addr]]</pl-labeled-container>
-                    <pl-labeled-container label="Действие" variant="horizontal">[[data.action_caption]]</pl-labeled-container>
-                </pl-flex-layout>
+    static template = html`
+        <pl-flex-layout vertical fit>
+            <pl-flex-layout vertical>
+                <pl-labeled-container label="Схема" orientation="horizontal">[[data.schemaname]]</pl-labeled-container>
+                <pl-labeled-container label="Раздел" orientation="horizontal">[[data.tablename]]</pl-labeled-container>
+                <pl-labeled-container label="Пользователь" orientation="horizontal">[[data.session_user_name]]</pl-labeled-container>
+                <pl-labeled-container label="Дата и время" orientation="horizontal">[[data.ts_log]]</pl-labeled-container>
+                <pl-labeled-container label="IP-адрес пользователя" orientation="horizontal">[[data.client_addr]]</pl-labeled-container>
+                <pl-labeled-container label="Действие" orientation="horizontal">[[data.action_caption]]</pl-labeled-container>
+            </pl-flex-layout>
+            <pl-flex-layout fit>
                 <pl-flex-layout fit>
-                    <pl-flex-layout fit>
-                        <pl-card fit>
-                            <pl-codeeditor value="[[data.row_data]]"></pl-codeeditor>
-                            <label slot="header-prefix" content="[[calcRowDataTitle(data.action)]]"></label>
-                        </pl-card>
-                    </pl-flex-layout>
-                    <pl-flex-layout fit hidden="[[hiddenChangedData(data.action)]]">
-                        <pl-card header="Произведённые изменения" fit>
-                            <pl-codeeditor value="[[data.row_changed_data]]"></pl-codeeditor>
-                        </pl-card>
-                    </pl-flex-layout>
+                    <pl-card fit>
+                        <pl-codeeditor value="[[data.row_data]]"></pl-codeeditor>
+                        <label slot="header-prefix" content="[[calcRowDataTitle(data.action)]]"></label>
+                    </pl-card>
+                </pl-flex-layout>
+                <pl-flex-layout fit hidden="[[hiddenChangedData(data.action)]]">
+                    <pl-card header="Произведённые изменения" fit>
+                        <pl-codeeditor value="[[data.row_changed_data]]"></pl-codeeditor>
+                    </pl-card>
                 </pl-flex-layout>
             </pl-flex-layout>
-            <pl-action id="aSelect" data="{{data}}" endpoint="/@nfjs/front-pl/fse/admin.journal.view/action/aSelect"></pl-action>
-		`;
-    }
+        </pl-flex-layout>
+        <pl-action id="aSelect" data="{{data}}" endpoint="/@nfjs/front-pl/fse/admin.journal.view/action/aSelect"></pl-action>
+    `;
 
     onConnect() {
         this.$.aSelect.execute({id: this.id});
