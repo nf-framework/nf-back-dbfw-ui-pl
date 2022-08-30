@@ -4,7 +4,7 @@ import { web } from '@nfjs/back';
 import { registerCustomElementsDir } from '@nfjs/front-server';
 import { endpointHandlers } from '@nfjs/front-pl';
 import { endpointAccess } from './lib/endpoint-access.js';
-import { addUser, addUserRole, delUserRole, getPasswordPolicy, delUser } from './lib/users.js';
+import { addUser, addUserRole, delUserRole, getPasswordPolicy, delUser, updUser, changePassword } from './lib/users.js';
 import { addRole, delRole, checkRoleDelete, addMenuPerm, delMenuPerm, addUnitPriv, delUnitPriv, addUnitBpPriv, delUnitBpPriv, getRole } from './lib/roles.js';
 
 const __dirname = path.join(path.dirname(decodeURI(new URL(import.meta.url).pathname))).replace(/^\\([A-Z]:\\)/, "$1");
@@ -23,6 +23,8 @@ async function init() {
     endpointHandlers.access = endpointAccess;
     // users
     web.on('POST', '/@nfjs/back-dbfw-ui-pl/addUser', { middleware: ['session', 'auth', 'json'] }, addUser);
+    web.on('POST', '/@nfjs/back-dbfw-ui-pl/updUser', { middleware: ['session', 'auth', 'json'] }, updUser);
+    web.on('POST', '/@nfjs/back-dbfw-ui-pl/changePasswordUser', { middleware: ['session', 'auth', 'json'] }, changePassword);
     web.on('POST', '/@nfjs/back-dbfw-ui-pl/getPasswordPolicy', { middleware: ['session', 'auth', 'json'] }, getPasswordPolicy);
     web.on('POST', '/@nfjs/back-dbfw-ui-pl/delUser', { middleware: ['session', 'auth', 'json'] }, delUser);
 

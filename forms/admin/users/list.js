@@ -34,9 +34,16 @@ export default class UserList extends PlForm {
                     <pl-grid data="{{users}}" selected="{{selectedUser}}">
                         <pl-grid-column sortable field="username" header="Пользователь" width="200" resizable></pl-grid-column>
                         <pl-grid-column sortable field="fullname" header="ФИО"></pl-grid-column>
-                        <pl-grid-column width="50" action>
+                        <pl-grid-column width="98" action>
                             <template>
+                                <style>
+                                    pl-flex-layout {
+                                        gap: 0px;
+                                    }
+                                </style>
                                 <pl-flex-layout>
+                                    <pl-icon-button variant="link" iconset="pl-default" size="16" icon="pencil" on-click="[[onUpdUserClick]]"></pl-icon-button>
+                                    <pl-icon-button variant="link" iconset="pl-default" size="16" icon="eye-closed" on-click="[[onChangePasswordUserClick]]"></pl-icon-button>
                                     <pl-icon-button variant="link" iconset="pl-default" size="16" icon="trashcan" on-click="[[onDeleteUserClick]]"></pl-icon-button>
                                 </pl-flex-layout>
                             </template>
@@ -80,10 +87,11 @@ export default class UserList extends PlForm {
     }
 
     _selectedUserObserver(selected) {
-        this.$.dsUserRoles.execute({
-            user_id: selected.id,
-            org_id: this.org_id
-        });
+        if (selected)
+            this.$.dsUserRoles.execute({
+                user_id: selected.id,
+                org_id: this.org_id
+            });
     }
 
     _userRolesObserver(data) {
@@ -138,8 +146,17 @@ export default class UserList extends PlForm {
     }
 
     async onAddUserClick() {
-        await this.open('admin.users.main');
+        await this.open('admin.users.main', {action: 'add'});
         this.$.dsUsers.execute();
+    }
+
+    async onUpdUserClick(event) {
+        await this.open('admin.users.main', {action: 'upd', id: event.model.row.id});
+        this.$.dsUsers.execute();
+    }
+
+    async onChangePasswordUserClick(event) {
+        await this.open('admin.users.main', {action: 'change_password', id: event.model.row.id});
     }
 
     async onDeleteUserClick(event) {

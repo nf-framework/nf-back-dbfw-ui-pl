@@ -27,6 +27,9 @@ export default class SubscriberEdit extends PlForm {
         formTitle: {
             type: String,
             value: 'Добавление / редактирование пользователя'
+        },
+        action: {
+            type: String
         }
     }
 
@@ -39,13 +42,21 @@ export default class SubscriberEdit extends PlForm {
     static template = html`
         <pl-valid-observer invalid="{{invalid}}"></pl-valid-observer>
         <pl-flex-layout scrollable fit vertical>
-            <pl-input orientation="horizontal" label="Имя пользователя" required value="{{user.username}}"></pl-input>
-            <pl-input orientation="horizontal" label="Фамилия Имя Отчество" required value="{{user.fullname}}"></pl-input>
-            <pl-input orientation="horizontal" type="password" label="Пароль" required value="{{user.password}}"></pl-input>
-            <pl-input orientation="horizontal" type="password" label="Подтвердите пароль" required value="{{user.password2}}"></pl-input>
-                <template d:repeat="[[checks]]">
-                    <span class="error">[[item]]<span>
+            <pl-dom-if if="[[isMainDataVisible(action)]]">
+                <template>
+                    <pl-input orientation="horizontal" label="Имя пользователя" required value="{{user.username}}" hidden="[[usernameHidden(action)]]"></pl-input>
+                    <pl-input orientation="horizontal" label="Фамилия Имя Отчество" required value="{{user.fullname}}"></pl-input>
                 </template>
+            </pl-dom-if>
+            <pl-dom-if if="[[isPasswordVisible(action)]]">
+                <template>
+                    <pl-input orientation="horizontal" type="password" label="Пароль" required value="{{user.password}}"></pl-input>
+                    <pl-input orientation="horizontal" type="password" label="Подтвердите пароль" required value="{{user.password2}}"></pl-input>
+                        <template d:repeat="[[checks]]">
+                            <span class="error">[[item]]<span>
+                        </template>
+                </template>
+            </pl-dom-if>
             <pl-flex-layout>
                 <pl-button label="Сохранить" variant="primary" disabled="[[computeDisabled(invalid,checks)]]" on-click="[[onSaveClick]]">
                     <pl-icon iconset="pl-default" size="16" icon="save" slot="suffix"></pl-icon>
@@ -56,15 +67,37 @@ export default class SubscriberEdit extends PlForm {
             </pl-flex-layout>
         </pl-flex-layout>
         <pl-action id="getPasswordPolicy" endpoint="@nfjs/back-dbfw-ui-pl/getPasswordPolicy" data="{{passwordPolicy}}"></pl-action>
-        <pl-action id="aSave" endpoint="@nfjs/back-dbfw-ui-pl/addUser"></pl-action>
+        <pl-action id="aAdd" endpoint="@nfjs/back-dbfw-ui-pl/addUser"></pl-action>
+        <pl-action id="aUpd" endpoint="@nfjs/back-dbfw-ui-pl/updUser"></pl-action>
+        <pl-action id="aChangePassword" endpoint="@nfjs/back-dbfw-ui-pl/changePasswordUser"></pl-action>
+        <pl-dataset id="dsUser" endpoint="/@nfjs/back/endpoint-sql/dbfw.users.users" type="sql-endpoint"></pl-dataset>
     `;
 
-    onConnect(){
+    async onConnect(){
         this.$.getPasswordPolicy.execute();
+        if (this.action === 'upd') {
+            const r = await this.$.dsUser.execute({id: this.id});
+            this.set('user', r?.[0]);
+        }
+        if (this.action === 'change_password') {
+            this.set('user.id', this.id);
+        }
     }
 
     computeDisabled(invalid, checks) {
         return checks.length > 0 || invalid;
+    }
+
+    isMainDataVisible(action) {
+        return action === 'add' || action === 'upd';
+    }
+
+    usernameHidden(action) {
+        return action === 'upd';
+    }
+
+    isPasswordVisible(action) {
+        return action === 'add' || action === 'change_password';
     }
 
     _userObserver(dat, old, mut) {
@@ -103,7 +136,8 @@ export default class SubscriberEdit extends PlForm {
     }
 
     async onSaveClick() {
-        this.$.aSave.execute(this.user)
+        const act = {add: this.$.aAdd, upd: this.$.aUpd, change_password: this.$.aChangePassword};
+        act[this.action].execute(this.user)
             .then(() => {
                 this.close();
             });
