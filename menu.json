@@ -16,6 +16,14 @@
         "order":    20
     },
     {
+        "caption":  "Опции",
+        "path":     "Система",
+        "form":     "admin.options.list",
+        "icon":     "settings",
+        "guid":     "d52bb808-bdcb-4597-8c05-7fb962decbcf",
+        "order":    30
+    },
+    {
         "caption": "Журналирование",
         "path":    "Система",
         "form":    "admin.journal.list",
