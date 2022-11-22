@@ -36,7 +36,13 @@ class PlAccess extends PlElement {
     }
 
     async execute() {
-        const req = await requestData(this.endpoint, { method: 'POST' });
+        let url = this.endpoint;
+        if (!url) {
+            // значение по умолчанию это fse(formServerEndpoint)
+            const formName = this.parentNode.host.localName.replace('pl-form-','');
+            url = `/@nfjs/front-pl/fse/${formName}/access/${this.id}`;
+        }
+        const req = await requestData(url, { method: 'POST' });
         this.data = await req.json();
         this._resolveAccess(true);
         return this.data;
