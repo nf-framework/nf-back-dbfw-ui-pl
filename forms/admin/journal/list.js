@@ -16,6 +16,14 @@ export default class JournalList extends PlForm {
         flt: {
             type: Object,
             value: () => ({})
+        },
+        filterDateFrom: {
+            type: String,
+            value: new Date(Math.floor((new Date()).getTime() / 3600000 ) * 3600000)
+        },
+        filterDateTo:{
+            type: String,
+            value: new Date()
         }
     }
 
@@ -31,12 +39,12 @@ export default class JournalList extends PlForm {
             </pl-flex-layout>
             <pl-flex-layout fit>
                 <pl-grid data="{{journal}}" on-row-dblclick="[[viewLog]]" partial-data>
-                    <pl-grid-column field="schemaname" header="Схема" resizable width="120"></pl-grid-column>
-                    <pl-grid-column field="tablename" header="Раздел" resizable width="200"></pl-grid-column>
-                    <pl-grid-column field="row_id" header="Id" sortable resizable width="200"></pl-grid-column>
-                    <pl-grid-column field="session_user_name" header="Пользователь" resizable width="160"></pl-grid-column>
-                    <pl-grid-column header="Дата и время выполнения действия" field="ts_log" format="DD.MM.YYYY HH:mm" resizable width="200"></pl-grid-column>
-                    <pl-grid-column header="IP-адрес пользователя" field="client_addr" resizable></pl-grid-column>
+                    <pl-grid-column field="schemaname" header="Схема" resizable width="120" sortable></pl-grid-column>
+                    <pl-grid-column field="tablename" header="Раздел" resizable width="200" sortable></pl-grid-column>
+                    <pl-grid-column field="row_id" header="Id" sortable resizable width="200" sortable></pl-grid-column>
+                    <pl-grid-column field="session_user_name" header="Пользователь" resizable width="160" sortable></pl-grid-column>
+                    <pl-grid-column header="Дата и время выполнения действия" field="ts_log" kind="date" format="DD.MM.YYYY HH:mm:ss" resizable width="200" sort="desc" sortable></pl-grid-column>
+                    <pl-grid-column header="IP-адрес пользователя" field="client_addr" resizable sortable></pl-grid-column>
                     <pl-grid-column header="Действие" resizable width="120">
                         <template>
                             <label>[[actionName(row.action)]]</label>
@@ -51,10 +59,10 @@ export default class JournalList extends PlForm {
                         <pl-filter-container id="fcJournal" data="{{journal}}">
                             <pl-flex-layout wrap>
                                 <pl-filter-item field="ts_log" id="dateTimefrom" operator=">=">
-                                    <pl-datetime label="Дата и время с"></pl-datetime>
+                                    <pl-datetime label="Дата и время с" value="{{filterDateFrom}}" type="datetime"></pl-datetime>
                                 </pl-filter-item>
                                 <pl-filter-item field="ts_log" id="dateTimeto" operator="<">
-                                    <pl-datetime label="Дата и время по"></pl-datetime>
+                                    <pl-datetime label="Дата и время по" value="{{filterDateTo}}" type="datetime"></pl-datetime>
                                 </pl-filter-item>
                                 <pl-filter-item field="session_user_name" cast="lower">
                                     <pl-input label="Пользователь"></pl-input>
@@ -82,7 +90,7 @@ export default class JournalList extends PlForm {
                                 <pl-filter-item is-param="true">
                                     <pl-input label="Значение поля раздела" value="{{flt.row_field_value}}"></pl-input>
                                 </pl-filter-item>
-                            </pl-flex-layout>    
+                            </pl-flex-layout>
                         </pl-filter-container>
                     </pl-flex-layout>
                 </pl-grid>
@@ -93,7 +101,7 @@ export default class JournalList extends PlForm {
 
     onConnect() {
         setTimeout(() => {
-            this.$.dsJournal.execute();
+            this.refreshJournal();
         },0);
     }
 
