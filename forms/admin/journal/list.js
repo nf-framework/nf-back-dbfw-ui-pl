@@ -19,7 +19,7 @@ export default class JournalList extends PlForm {
         },
         filterDateFrom: {
             type: String,
-            value: new Date(Math.floor((new Date()).getTime() / 3600000 ) * 3600000)
+            value: new Date(new Date().getTime() - 3600000)
         },
         filterDateTo:{
             type: String,
