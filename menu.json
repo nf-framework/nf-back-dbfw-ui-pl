@@ -24,6 +24,14 @@
         "order":    30
     },
     {
+        "caption":  "Простой импорт данных",
+        "path":     "Система",
+        "form":     "admin.import.simple_csv",
+        "icon":     "table",
+        "guid":     "1e2a710d-62bf-4c1c-b49d-d5839dff68aa",
+        "order":    40
+    },
+    {
         "caption": "Журналирование",
         "path":    "Система",
         "form":    "admin.journal.list",

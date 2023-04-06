@@ -6,6 +6,7 @@ import { endpointHandlers } from '@nfjs/front-pl';
 import { endpointAccess } from './lib/endpoint-access.js';
 import { addUser, addUserRole, delUserRole, getPasswordPolicy, delUser, updUser, changePassword } from './lib/users.js';
 import { addRole, delRole, checkRoleDelete, addMenuPerm, delMenuPerm, addUnitPriv, delUnitPriv, addUnitBpPriv, delUnitBpPriv, getRole } from './lib/roles.js';
+import * as simpleCsvImport from './lib/simple-csv-import.js';
 
 const __dirname = path.join(path.dirname(decodeURI(new URL(import.meta.url).pathname))).replace(/^\\([A-Z]:\\)/, "$1");
 let menu = await api.loadJSON(__dirname + '/menu.json');
@@ -44,6 +45,8 @@ async function init() {
     web.on('POST', '/@nfjs/back-dbfw-ui-pl/roles/delUnitPriv', { middleware: ['session', 'auth', 'json'] }, delUnitPriv);
     web.on('POST', '/@nfjs/back-dbfw-ui-pl/roles/addUnitBpPriv', { middleware: ['session', 'auth', 'json'] }, addUnitBpPriv);
     web.on('POST', '/@nfjs/back-dbfw-ui-pl/roles/delUnitBpPriv', { middleware: ['session', 'auth', 'json'] }, delUnitBpPriv);
+
+    web.on('POST', '/@nfjs/back-dbfw-ui-pl/simple-csv-import', { middleware: ['session', 'auth', 'json'] }, simpleCsvImport.handle);
 
 }
 
