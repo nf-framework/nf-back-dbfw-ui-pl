@@ -1,0 +1,66 @@
+import { html } from "polylib";
+import DbfwCommonList from "@nfjs/back-dbfw-ui-pl/components/form-common-list.js";
+
+export default class {{{formClass}}} extends DbfwCommonList {
+    static properties = {
+        ...DbfwCommonList.properties,
+        mdl: { value: '{{{entitySchema}}}' },
+        unit: { value: '{{{entityName}}}' },
+        unitName: { value: '{{{formTitle}}}' },
+        cardForm: { value: '{{{cardForm}}}' },
+        cardFormIsModal: { value: true },
+    };
+
+    static template = html(`
+        <pl-flex-layout fit vertical>
+            {{#if filters.length}}
+            <pl-flex-layout align="flex-end">
+                <pl-filter-container data="\{{data}}" id="fltrContainer">
+                    {{{filters}}}
+                </pl-filter-container>
+                <pl-button loading="[[loading]]" variant="ghost" label="Найти" on-click="[[search]]">
+                    <pl-icon animated="[[loading]]" iconset="pl-default" size="16" icon="search" slot="prefix"></pl-icon>
+                </pl-button>
+                <pl-button variant="link" label="Очистить" on-click="[[clearFilter]]">
+                    <pl-icon iconset="pl-default" size="16" icon="close-circle-filled" slot="prefix"></pl-icon>
+                </pl-button>
+            </pl-flex-layout>
+            {{/if}}
+            ${DbfwCommonList.templateGridBegin}
+                {{{columns}}}
+            ${DbfwCommonList.templateGridEnd}
+        </pl-flex-layout>
+        ${DbfwCommonList.templateDsList}
+    `);
+    {{#if filters.length}}
+    async search(){
+        this.$.fltrContainer.applyFilters();
+        await this.$.dsData.execute();
+    }
+
+    async clearFilter() {
+        this.$.fltrContainer.clearFilters();
+        await this.search()
+    }
+    {{/if}}
+    serverEndpoints = {
+        access: {
+            acPrivs: {
+                privs: ['{{{entitySchema}}}.{{{entityName}}}.add', '{{{entitySchema}}}.{{{entityName}}}.upd', '{{{entitySchema}}}.{{{entityName}}}.del']
+            }
+        },
+        action: {
+            aDel: {
+                "@main": {
+                    action: '{{{entitySchema}}}.{{{entityName}}}.del',
+                    type: "broker"
+                }
+            }
+        },
+        dataset: {
+            dsData: {
+                text: `select * from {{{entitySchema}}}.v4{{{entityName}}}`
+            },
+        }
+    }//serverEndpoints
+}

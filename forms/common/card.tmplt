@@ -1,0 +1,51 @@
+import { html } from "polylib";
+import DbfwCommonCard from "@nfjs/back-dbfw-ui-pl/components/form-common-card.js";
+
+export default class {{{formClass}}} extends DbfwCommonCard {
+    static properties = {
+        ...DbfwCommonCard.properties,
+        mdl: { value: '{{{entitySchema}}}' },
+        unit: { value: '{{{entityName}}}' },
+        unitName: { value: '{{{formTitle}}}' },
+        {{{properties}}}
+    };
+
+    static template = html(`
+        ${DbfwCommonCard.templateBegin}       
+            {{{inputs}}}
+        ${DbfwCommonCard.templateEnd}
+        {{{dataSources}}}
+    `);
+
+    async onConnect() {
+        this.formTitle = `${this.unitName}: ${(this.recordId ? 'Редактирование' : 'Добавление')}`;
+        if (this.recordId) {
+            await this.$.aGet.execute({id: this.recordId})
+        }
+        this.$.obRecord.reset();
+        this.$.obRecord.snapshot();
+    }
+
+    serverEndpoints = {
+        action: {
+            aGet: {
+                "@main": {
+                    action: '{{{entitySchema}}}.{{{entityName}}}.get',
+                    type: "broker",
+                }
+            },
+            aSave: {
+                "@main": {
+                    action: '{{{entitySchema}}}.{{{entityName}}}.mod',
+                    type: "broker",
+                    out: "id"
+                }
+            }
+        },
+        access: {
+            acPrivs: {
+                privs: ['{{{entitySchema}}}.{{{entityName}}}.add', '{{{entitySchema}}}.{{{entityName}}}.upd']
+            }
+        }
+    }//serverEndpoints
+}
