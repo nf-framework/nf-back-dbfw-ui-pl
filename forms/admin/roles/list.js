@@ -7,6 +7,7 @@ export default class RoleList extends PlForm {
         menuPermList: { value: () => ([]), observer: '_menuPermObserver' },
         roles: { value: () => ([]) },
         activeRole: { value: () => undefined, observer: '_activeRoleObserver' },
+        selectedRoles: { value: () => [] },
         unitList: { value: () => ([]), observer: '_unitlistObserver' },
         rolePrivs: { value: () => ([]), observer: '_rolePrivsObserver' },
         activeRolePrivs: { value: () => undefined, observer: '_activeRolePrivObserver' },
@@ -29,10 +30,16 @@ export default class RoleList extends PlForm {
     static template = html`
         <pl-flex-layout fit >
                 <pl-flex-layout fit>
-                    <pl-grid data="{{roles}}" selected="{{activeRole}}" on-row-dblclick="[[onEditRoleClick]]">
+                    <pl-grid data="{{roles}}" selected="{{activeRole}}" selected-list="{{selectedRoles}}" on-row-dblclick="[[onEditRoleClick]]" multi-select>
                         <pl-flex-layout slot="top-toolbar">
                             <pl-button variant="primary" label="Добавить" on-click="[[onAddRoleClick]]">
                                 <pl-icon iconset="pl-default" size="16" icon="plus-circle" slot="prefix"></pl-icon>
+                            </pl-button>
+                            <pl-button variant="ghost" label="Экспорт" on-click="[[onExportClick]]" disabled="[[!selectedRoles.length]]">
+                                <pl-icon iconset="pl-default" size="16" icon="download" slot="prefix"></pl-icon>
+                            </pl-button>
+                            <pl-button variant="ghost" label="Импорт" on-click="[[onImportClick]]">
+                                <pl-icon iconset="pl-default" size="16" icon="upload" slot="prefix"></pl-icon>
                             </pl-button>
                         </pl-flex-layout>
                         <pl-grid-column sortable field="code" header="Код" width="150" resizable></pl-grid-column>
@@ -122,6 +129,8 @@ export default class RoleList extends PlForm {
         <pl-action id="aDelUnitPriv" endpoint="@nfjs/back-dbfw-ui-pl/roles/delUnitPriv"></pl-action>
         <pl-action id="aAddUnitBpPriv" endpoint="@nfjs/back-dbfw-ui-pl/roles/addUnitBpPriv"></pl-action>
         <pl-action id="aDelUnitBpPriv" endpoint="@nfjs/back-dbfw-ui-pl/roles/delUnitBpPriv"></pl-action>
+
+        <pl-action id="aExportRoleUnitPrivs" endpoint="@nfjs/back-dbfw/api/roles/exportRoleUnitPrivs" method="GET"></pl-action>
     `;
 
 async onConnect() {
@@ -141,6 +150,43 @@ async onConnect() {
         await this.open('admin.roles.main', { roleId: event.model.row.id });
         await this.$.dsRoles.execute();
         this.activeRole = this.roles[0];
+    }
+    
+    async onExportClick(event) {
+        if (!this.selectedRoles.length) return;
+
+        const query = new URLSearchParams({
+            roles: this.selectedRoles.map(el => el.code).join(';')
+        });
+        const file = await fetch(`/@nfjs/back-dbfw/api/roles/exportRoleUnitPrivs/?${query}`);
+        const header = file.headers.get('Content-disposition');
+        const content = header?.split(';')[1];
+        const name = content?.split('=')[1] || 'roleUnitPrivs.json';
+        const json = await file.json();
+        if (json.error) {
+            this.notify(json.error, { type: 'error', header: 'Произошла ошибка при экспорте ролей', icon: 'close-circle' });
+            return;
+        }
+
+        const blob = new Blob([JSON.stringify(json)], { type: 'application/json' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        document.body.appendChild(a);
+        a.href = url;
+        a.download = name;
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+    }
+
+    async onImportClick(event) {
+        const res = await this.openModal('admin.roles.import', {}, { size: 'medium' });
+        if (res) {
+            this.notify('Роли были успешно импортированы');
+            const activeRole = this.activeRole;
+            await this.$.dsRoles.execute();
+            this.activeRole = this.roles.find(role => role.id == activeRole.id);
+        }
     }
 
     async _activeRoleObserver(val) {
