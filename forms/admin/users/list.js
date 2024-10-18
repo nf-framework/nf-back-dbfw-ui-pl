@@ -53,7 +53,7 @@ export default class UserList extends PlForm {
                 <pl-flex-layout fit>
                     <pl-grid data="{{roles}}">
                         <pl-grid-column sortable field="caption" header="Роль"></pl-grid-column>
-                        <pl-grid-column width="50">
+                        <pl-grid-column justify="center" width="50">
                             <template>
                                 <pl-checkbox disabled="[[!selectedUser]]" checked="{{row.exists}}"></pl-checkbox>
                             </template>
