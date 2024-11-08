@@ -54,9 +54,8 @@ class PlDictionaryCombobox extends PlElement {
     }
 
     static css = css`
-        :host([stretch]) {
-            width: 100%;
-            flex-shrink: 1;
+        :host {
+            display: contents;
         }
     `;
 
@@ -100,10 +99,6 @@ class PlDictionaryCombobox extends PlElement {
             required-args="code"
         ></pl-dataset>
     `;
-
-    connectedCallback() {
-        super.connectedCallback();
-    }
 
     _compose(...arg) {
         return compose(...arg);
