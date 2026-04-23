@@ -28,7 +28,7 @@ export default class RoleList extends PlForm {
     `;
 
     static template = html`
-        <pl-flex-layout fit >
+        <pl-flex-layout fit>
                 <pl-flex-layout fit>
                     <pl-grid data="{{roles}}" selected="{{activeRole}}" selected-list="{{selectedRoles}}" on-row-dblclick="[[onEditRoleClick]]" multi-select>
                         <pl-flex-layout slot="top-toolbar">
@@ -44,14 +44,14 @@ export default class RoleList extends PlForm {
                         </pl-flex-layout>
                         <pl-grid-column sortable field="code" header="Код" width="150" resizable></pl-grid-column>
                         <pl-grid-column sortable field="caption" header="Наименование"></pl-grid-column>
-                        <pl-grid-column width="80" action justify=center>
+                        <pl-grid-column width="80" action justify="center">
                             <template>
                                 <style>
                                     pl-flex-layout {
                                         gap: 0;
                                     }
                                 </style>
-                                <pl-flex-layout justify=center>
+                                <pl-flex-layout justify="center">
                                     <pl-icon-button variant="link" iconset="pl-default" size="16" icon="pencil" on-click="[[onEditRoleClick]]"></pl-icon-button>
                                     <pl-icon-button variant="link" iconset="pl-default" size="16" icon="trashcan" on-click="[[onDelRoleClick]]"></pl-icon-button>
                                 </pl-flex-layout>
@@ -65,7 +65,7 @@ export default class RoleList extends PlForm {
                         <pl-flex-layout fit vertical>
                             <pl-grid data="{{unitList}}" key-field="unit" pkey-field="mdl" class="main" selected="{{activeRolePrivs}}" tree>
                             <pl-grid-column field="caption" header="Раздел"></pl-grid-column>
-                            <pl-grid-column width="80" header="Просмотр" justify="center">
+                            <pl-grid-column width="90" header="Просмотр" justify="center">
                                 <template>
                                     <pl-checkbox hidden="[[!row.is_module]]" checked="{{row.view}}"></pl-checkbox>
                                 </template>
@@ -75,12 +75,12 @@ export default class RoleList extends PlForm {
                                     <pl-checkbox hidden="[[!row.is_module_add]]" checked="{{row.add}}"></pl-checkbox>
                                 </template>
                             </pl-grid-column>
-                            <pl-grid-column width="85" header="Обновление" justify="center">
+                            <pl-grid-column width="90" header="Обновление" justify="center">
                                 <template>
                                     <pl-checkbox hidden="[[!row.is_module_upd]]" checked="{{row.upd}}"></pl-checkbox>
                                 </template>
                             </pl-grid-column>
-                            <pl-grid-column width="75" header="Удаление" justify="center">
+                            <pl-grid-column width="90" header="Удаление" justify="center">
                                 <template>
                                     <pl-checkbox hidden="[[!row.is_module_del]]" checked="{{row.del}}"></pl-checkbox>
                                 </template>
@@ -94,7 +94,7 @@ export default class RoleList extends PlForm {
                         <pl-grid class="others" data="{{otherPrivs}}">
                             <pl-grid-column field="action" header="Действие"></pl-grid-column>
                             <pl-grid-column field="caption" header="Наименование"></pl-grid-column>
-                            <pl-grid-column width="85">
+                            <pl-grid-column width="85" titlefield justify="center">
                                 <template>
                                         <pl-checkbox checked="{{row.exists}}"></pl-checkbox>
                                 </template>
